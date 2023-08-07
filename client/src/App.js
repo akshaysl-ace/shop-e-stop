@@ -1,7 +1,19 @@
+import Header from "./components/Header"
+import Footer from "./components/Footer";
+import { Outlet } from "react-router-dom";
+import { Container } from "react-bootstrap"
 
 const App = () => {
   return (
-    <h1>Welcome to Shop-e-Stop</h1>
+    <>
+      <Header />
+      <main className="py-3">
+        <Container>
+          <Outlet />
+        </Container>
+      </main>
+      <Footer />
+    </>
   )
 }
 
