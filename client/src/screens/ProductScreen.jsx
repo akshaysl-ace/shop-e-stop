@@ -1,23 +1,53 @@
-import { Link, useParams } from 'react-router-dom';
-import { Row, Col, Image, ListGroup, Card, Button } from 'react-bootstrap';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import {
+  Row,
+  Col,
+  Image,
+  ListGroup,
+  Card,
+  Button,
+  Form,
+} from 'react-bootstrap';
 import Rating from '../components/Rating';
-import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useGetProductDetailsQuery } from '../data/slices/productsSlice';
+import Loader from '../components/Loader';
+import Message from '../components/Message';
+import { useState } from 'react';
+import { addToCart } from '../data/slices/cartSlice';
+import { useDispatch } from 'react-redux';
 
 function ProductScreen() {
-  const [product, setProduct] = useState({});
   const { id: productId } = useParams();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchProduct = async () => {
-      const { data } = await axios.get(`/api/products/${productId}`);
-      setProduct(data);
-    };
+  const {
+    data: product,
+    isLoading,
+    isError,
+    error,
+  } = useGetProductDetailsQuery(productId);
 
-    fetchProduct();
-  }, [productId]);
+  const [qty, setQty] = useState(1);
 
-  return (
+  const addItemToCartHandler = () => {
+    dispatch(
+      addToCart({
+        ...product,
+        qty: qty,
+      }),
+    );
+    const shouldOpenCart = window.confirm('Do you want to open the Cart ?');
+    if (shouldOpenCart) navigate('/cart');
+  };
+
+  return isLoading ? (
+    <Loader />
+  ) : isError ? (
+    <Message variant='danger'>
+      {error?.error || error?.message || error?.data.message}
+    </Message>
+  ) : (
     <>
       <Link className='btn btn-light my-3' to='/'>
         Go Back
@@ -37,7 +67,6 @@ function ProductScreen() {
                 text={`${product.numReviews} reviews`}
               />
             </ListGroup.Item>
-            {/* <ListGroup.Item>Price : ${product.price}</ListGroup.Item> */}
             <ListGroup.Item>{product.description}</ListGroup.Item>
           </ListGroup>
         </Col>
@@ -62,11 +91,31 @@ function ProductScreen() {
                   </Col>
                 </Row>
               </ListGroup.Item>
+              {product.countInStock > 0 && (
+                <ListGroup.Item>
+                  <Row>
+                    <Col>Qty</Col>
+                    <Col>
+                      <Form.Control
+                        as='select'
+                        value={qty}
+                        onChange={e => setQty(Number(e.target.value))}>
+                        {[...Array(product.countInStock).keys()].map(x => (
+                          <option key={x + 1} value={x + 1}>
+                            {x + 1}
+                          </option>
+                        ))}
+                      </Form.Control>
+                    </Col>
+                  </Row>
+                </ListGroup.Item>
+              )}
               <ListGroup.Item>
                 <Button
                   className='btn-bock'
                   type='button'
-                  disabled={product.countInStock === 0}>
+                  disabled={product.countInStock === 0}
+                  onClick={addItemToCartHandler}>
                   Add to Cart
                 </Button>
               </ListGroup.Item>
