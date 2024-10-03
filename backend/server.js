@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import connectToDB from './config/db.js';
 import productsRouter from './routes/productRoutes.js';
+import usersRouter from './routes/userRoutes.js';
 import { errorHandler, notFound } from './middleware/errorMiddleware.js';
 
 // First of all, init the config else .env variables will not be loaded.
@@ -19,7 +20,7 @@ app.get('/', (req, res) => {
 
 // Main routes
 app.use('/api/products', productsRouter);
-
+app.use('/api/users', usersRouter);
 
 // Use Middlewares
 app.use(notFound);
