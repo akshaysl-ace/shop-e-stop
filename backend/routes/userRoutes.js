@@ -8,6 +8,6 @@ usersRouter.route('/').post(registerUser).get(protect, adminify, getUsers);
 usersRouter.post('/auth', authenticateUser);
 usersRouter.post('/logout', logoutUser);
 usersRouter.route('/profile').get(protect, getUserProfile).put(protect, updateUserProfile);
-usersRouter.route('/:id').get(protect, adminify, getUserById).put(protect, adminify, updateUser).delete(protect, adminify, deleteUser);
+usersRouter.route('/:id').get(protect, adminify, getUserById).delete(protect, adminify, deleteUser).put(protect, adminify, updateUser);
 
 export default usersRouter;
