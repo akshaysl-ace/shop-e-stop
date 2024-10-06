@@ -1,12 +1,13 @@
 import express from 'express';
 import { authenticateUser, deleteUser, getUserById, getUserProfile, getUsers, logoutUser, registerUser, updateUser, updateUserProfile } from '../controllers/userController.js';
+import { adminify, protect } from './../middleware/authMiddleware.js';
 
 const usersRouter = express.Router();
 
-usersRouter.route('/').post(registerUser).get(getUsers);
-usersRouter.post('/login', authenticateUser);
+usersRouter.route('/').post(registerUser).get(protect, adminify, getUsers);
+usersRouter.post('/auth', authenticateUser);
 usersRouter.post('/logout', logoutUser);
-usersRouter.route('/profile').get(getUserProfile).put(updateUserProfile);
-usersRouter.route('/:id').get(getUserById).put(updateUser).delete(deleteUser);
+usersRouter.route('/profile').get(protect, getUserProfile).put(protect, updateUserProfile);
+usersRouter.route('/:id').get(protect, adminify, getUserById).put(protect, adminify, updateUser).delete(protect, adminify, deleteUser);
 
 export default usersRouter;

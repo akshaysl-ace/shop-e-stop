@@ -5,6 +5,7 @@ import Product from "../models/productModel.js";
 // @route  GET api/products
 // @access Public
 export const getProducts = asyncHandler(async (req, res) => {
+    console.log("get productss")
     const products = await Product.find({});
     return res.json(products || []);
 });
